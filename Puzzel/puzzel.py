@@ -7,7 +7,6 @@ _goal_state = [[1, 2, 3],
 
 
 def index(item, seq):
-    """Helper function that returns -1 for non-found index value of a seq"""
     if item in seq:
         return seq.index(item)
     else:
@@ -16,12 +15,9 @@ def index(item, seq):
 
 class EightPuzzle:
 
-    def __init__(self):
-        # heuristic value
+    def __init__(self) :
         self._hval = 0
-        # search depth of current instance
         self._depth = 0
-        # parent node in search path
         self._parent = None
         self.adj_matrix = []
         for i in range(3):
@@ -47,13 +43,9 @@ class EightPuzzle:
         return p
 
     def _get_legal_moves(self):
-        """Returns list of tuples with which the free space may
-        be swapped"""
-        # get row and column of the empty piece
         row, col = self.find(0)
         free = []
 
-        # find which pieces can move there
         if row > 0:
             free.append((row - 1, col))
         if col > 0:
@@ -86,9 +78,6 @@ class EightPuzzle:
             return self._parent._generate_solution_path(path)
 
     def solve(self, h):
-        """Performs A* search for goal state.
-        h(puzzle) - heuristic function, returns an integer
-        """
 
         def is_solved(puzzle):
             return puzzle.adj_matrix == _goal_state
@@ -108,7 +97,6 @@ class EightPuzzle:
             succ = x._generate_moves()
             idx_open = idx_closed = -1
             for move in succ:
-                # have we already seen this node?
                 idx_open = index(move, openl)
                 idx_closed = index(move, closedl)
                 hval = h(move)
@@ -120,7 +108,6 @@ class EightPuzzle:
                 elif idx_open > -1:
                     copy = openl[idx_open]
                     if fval < copy._hval + copy._depth:
-                        # copy move's values over existing
                         copy._hval = hval
                         copy._parent = move._parent
                         copy._depth = move._depth
@@ -134,7 +121,6 @@ class EightPuzzle:
             closedl.append(x)
             openl = sorted(openl, key=lambda p: p._hval + p._depth)
 
-        # if finished state not found, return failure
         return [], 0
 
     def shuffle(self, step_count):
@@ -146,8 +132,6 @@ class EightPuzzle:
             row, col = target
 
     def find(self, value):
-        """returns the row, col coordinates of the specified value
-           in the graph"""
         if value < 0 or value > 8:
             raise Exception("value out of range")
 
@@ -157,39 +141,24 @@ class EightPuzzle:
                     return row, col
 
     def peek(self, row, col):
-        """returns the value at the specified row and column"""
         return self.adj_matrix[row][col]
 
-    def poke(self, row, col, value):
-        """sets the value at the specified row and column"""
+    def poke(self, row, col, value)
         self.adj_matrix[row][col] = value
 
     def swap(self, pos_a, pos_b):
-        """swaps values at the specified coordinates"""
         temp = self.peek(*pos_a)
         self.poke(pos_a[0], pos_a[1], self.peek(*pos_b))
         self.poke(pos_b[0], pos_b[1], temp)
 
 
 def heur(puzzle, item_total_calc, total_calc):
-    """
-    Heuristic template that provides the current and target position for each number and the
-    total function.
-    Parameters:
-    puzzle - the puzzle
-    item_total_calc - takes 4 parameters: current row, target row, current col, target col.
-    Returns int.
-    total_calc - takes 1 parameter, the sum of item_total_calc over all entries, and returns int.
-    This is the value of the heuristic function
-    """
     t = 0
     for row in range(3):
         for col in range(3):
             val = puzzle.peek(row, col) - 1
             target_col = val % 3
             target_row = val / 3
-
-            # account for 0 as blank
             if target_row < 0:
                 target_row = 2
 
@@ -197,9 +166,6 @@ def heur(puzzle, item_total_calc, total_calc):
 
     return total_calc(t)
 
-
-# some heuristic functions, the best being the standard manhattan distance in this case, as it comes
-# closest to maximizing the estimated distance while still being admissible.
 
 def h_manhattan(puzzle):
     return heur(puzzle,
@@ -247,9 +213,6 @@ def main():
     path, count = p.solve(h_linear_lsq)
     print("Solved with linear least squares exploring", count, "states")
 
-
-#    path, count = p.solve(heur_default)
-#    print "Solved with BFS-equivalent in", count, "moves"
 
 if __name__ == "__main__":
     main()
